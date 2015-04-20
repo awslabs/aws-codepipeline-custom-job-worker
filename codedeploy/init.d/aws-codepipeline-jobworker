@@ -1,0 +1,79 @@
+#! /bin/sh
+NAME="aws-codepipeline-jobworker"
+DESC="AWS CodePipeline Job Worker Service"
+
+# The path to the base folder of the job worker
+FILE_PATH="/opt/aws-codepipeline-jobworker"
+
+# The path to Jsvc
+EXEC="$FILE_PATH/jsvc"
+
+# The path to java
+JAVA="/etc/alternatives/jre_1.8.0"
+
+# Classpath containing all jar files
+CLASS_PATH="$(find "$FILE_PATH" -name '*.jar' | xargs echo | tr ' ' ':')"
+
+# The fully qualified name of the daemon class to execute
+CLASS="com.amazonaws.codepipeline.jobworker.JobWorkerDaemon"
+
+#The user under which to run the daemon
+USER="root"
+
+# The file that will contain the process identification number
+PID="$FILE_PATH/pid/$NAME.pid"
+
+# Log output directory
+LOG_OUT_DIR="/var/log/aws-codepipeline-jobworker"
+
+# System.out
+LOG_OUT="$LOG_OUT_DIR/$NAME.out"
+
+# System.err
+LOG_ERR="$LOG_OUT_DIR/$NAME.err"
+
+jsvc_exec()
+{
+    cd $FILE_PATH
+    $EXEC -home $JAVA -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID $1 $CLASS
+}
+
+case "$1" in
+    start)
+        echo "Starting the $DESC..."
+
+        # Start the service
+        jsvc_exec
+
+        echo "The $DESC has started."
+    ;;
+    stop)
+        echo "Stopping the $DESC..."
+
+        # Stop the service
+        jsvc_exec "-stop"
+
+        echo "The $DESC has stopped."
+    ;;
+    restart)
+        if [ -f "$PID" ]; then
+
+            echo "Restarting the $DESC..."
+
+            # Stop the service
+            jsvc_exec "-stop"
+
+            # Start the service
+            jsvc_exec
+
+            echo "The $DESC has restarted."
+        else
+            echo "Daemon not running, no action taken"
+            exit 1
+        fi
+            ;;
+    *)
+    echo "Usage: /etc/init.d/$NAME {start|stop|restart}" >&2
+    exit 3
+    ;;
+esac

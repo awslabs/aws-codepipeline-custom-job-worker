@@ -1,0 +1,25 @@
+version: 0.0
+os: linux
+files:
+  - source: ./init.d
+    destination: /etc/init.d/
+  - source: ./app
+    destination: /opt/aws-codepipeline-jobworker/
+permissions:
+  - object: /etc/init.d/aws-codepipeline-jobworker
+    mode: 751
+  - object: /opt/aws-codepipeline-jobworker/jsvc
+    mode: 751
+hooks:
+  ApplicationStop:
+    - location: scripts/application-stop.sh
+      timeout: 300
+      runas: root
+  BeforeInstall:
+    - location: scripts/before-install.sh
+      timeout: 300
+      runas: root
+  ApplicationStart:
+    - location: scripts/application-start.sh
+      timeout: 60
+      runas: root
