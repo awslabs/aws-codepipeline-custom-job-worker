@@ -33,7 +33,7 @@ public class JobWorkerConfiguration {
     /**
      * Action type this job worker is polling and processing jobs for.
      */
-    private static final ActionType ACTION_TYPE = new ActionType("Deploy", "ThirdParty", "TestProvider", "1");
+    private static final ActionType ACTION_TYPE = new ActionType("Deploy", "ThirdParty", "ThirdPartyDeployProvider", "1");
 
     /**
      * AWS Region.
