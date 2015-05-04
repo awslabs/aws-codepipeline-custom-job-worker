@@ -1,79 +1,104 @@
-#! /bin/sh
-NAME="aws-codepipeline-jobworker"
-DESC="AWS CodePipeline Job Worker Service"
+#!/bin/bash
+#
+# chkconfig: 2345 98 02
+#
+### BEGIN INIT INFO
+# Provides:          aws-codepipeline-jobworker
+# Required-Start:    $all
+# Required-Stop:     $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: AWS CodePipeline JobWorker
+# Description:       The AWS CodePipeline JobWorker processes CodePipeline jobs for a particular Action Type.
+### END INIT INFO
+#
+# Usage: /etc/init.d/aws-codepipeline-jobworker {start|stop|restart}
+# Description: The AWS CodePipeline JobWorker processes CodePipeline jobs for a particular Action Type.
+#              This init.d script uses Apache Commons Daemons (jsvc) to start, stop and restart
+#              the job worker.
+#
+# Install Directory: /opt/aws-codepipeline-jobworker
+# PID File:          /opt/aws-codepipeline-jobworker/pid/aws-codepipeline-jobworker.pid
+# Standard Output:   /var/log/aws-codepipeline-jobworker/aws-codepipeline-jobworker.out
+# Standard Error:    /var/log/aws-codepipeline-jobworker/aws-codepipeline-jobworker.err
 
-# The path to the base folder of the job worker
-FILE_PATH="/opt/aws-codepipeline-jobworker"
+SERVICE_NAME="aws-codepipeline-jobworker"
+SERVICE_DESCRIPTION="AWS CodePipeline JobWorker Service"
+INSTALL_DIR="/opt/$SERVICE_NAME"
 
-# The path to Jsvc
-EXEC="$FILE_PATH/jsvc"
+# The user under which to run the daemon
+RUN_AS_USER="root"
 
-# The path to java
-JAVA="/etc/alternatives/jre_1.8.0"
+# Path to the Apache Commons Daemon Executable
+JSVC_EXEC="$INSTALL_DIR/jsvc"
+
+# Path to the Java Runtime Environment (1.8.0 or higher)
+JAVA_JRE_DIR="/etc/alternatives/jre_1.8.0"
 
 # Classpath containing all jar files
-CLASS_PATH="$(find "$FILE_PATH" -name '*.jar' | xargs echo | tr ' ' ':')"
+CLASS_PATH="$(find "$INSTALL_DIR" -name '*.jar' | xargs echo | tr ' ' ':')"
 
-# The fully qualified name of the daemon class to execute
-CLASS="com.amazonaws.codepipeline.jobworker.JobWorkerDaemon"
+# The fully qualified name of the job worker daemon class to execute
+CLASS_NAME_DAEMON="com.amazonaws.codepipeline.jobworker.JobWorkerDaemon"
 
-#The user under which to run the daemon
-USER="root"
+# PID file which contains the process identification number
+PID_FILE="$INSTALL_DIR/pid/$SERVICE_NAME.pid"
 
-# The file that will contain the process identification number
-PID="$FILE_PATH/pid/$NAME.pid"
+# Log file for standard output
+LOG_STD_OUT="/var/log/$SERVICE_NAME/$SERVICE_NAME.out"
 
-# Log output directory
-LOG_OUT_DIR="/var/log/aws-codepipeline-jobworker"
+# Log file for standard error output
+LOG_ERR_OUT="/var/log/$SERVICE_NAME/$SERVICE_NAME.err"
 
-# System.out
-LOG_OUT="$LOG_OUT_DIR/$NAME.out"
-
-# System.err
-LOG_ERR="$LOG_OUT_DIR/$NAME.err"
-
-jsvc_exec()
+aws_codepipeline_job_worker()
 {
-    cd $FILE_PATH
-    $EXEC -home $JAVA -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID $1 $CLASS
+    cd $INSTALL_DIR
+    $JSVC_EXEC $1 -user $RUN_AS_USER -errfile $LOG_ERR_OUT -outfile $LOG_STD_OUT -pidfile $PID_FILE -home $JAVA_JRE_DIR -classpath $CLASS_PATH $CLASS_NAME_DAEMON
+}
+
+start()
+{
+    echo "Starting $SERVICE_DESCRIPTION ..."
+    aws_codepipeline_job_worker
+    echo "$SERVICE_DESCRIPTION started."
+}
+
+stop()
+{
+    echo "Stopping $SERVICE_DESCRIPTION ..."
+    aws_codepipeline_job_worker "-stop"
+    echo "$SERVICE_DESCRIPTION stopped."
+}
+
+restart()
+{
+    echo "Restarting $SERVICE_DESCRIPTION ..."
+    if [ -f "$PID" ]; then
+        stop
+    else
+        echo "$SERVICE_DESCRIPTION is not running."
+    fi
+    start
+}
+
+usage()
+{
+    echo "Usage: /etc/init.d/$SERVICE_NAME {start|stop|restart}" >&2
 }
 
 case "$1" in
     start)
-        echo "Starting the $DESC..."
-
-        # Start the service
-        jsvc_exec
-
-        echo "The $DESC has started."
-    ;;
+        start
+        ;;
     stop)
-        echo "Stopping the $DESC..."
-
-        # Stop the service
-        jsvc_exec "-stop"
-
-        echo "The $DESC has stopped."
-    ;;
+        stop
+        ;;
     restart)
-        if [ -f "$PID" ]; then
-
-            echo "Restarting the $DESC..."
-
-            # Stop the service
-            jsvc_exec "-stop"
-
-            # Start the service
-            jsvc_exec
-
-            echo "The $DESC has restarted."
-        else
-            echo "Daemon not running, no action taken"
-            exit 1
-        fi
-            ;;
+        restart
+        ;;
     *)
-    echo "Usage: /etc/init.d/$NAME {start|stop|restart}" >&2
-    exit 3
-    ;;
+        usage
+        exit 1
+        ;;
 esac
+exit 0
