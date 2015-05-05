@@ -41,19 +41,22 @@ CLASS_PATH="$(find "$INSTALL_DIR" -name '*.jar' | xargs echo | tr ' ' ':')"
 # The fully qualified name of the job worker daemon class to execute
 CLASS_NAME_DAEMON="com.amazonaws.codepipeline.jobworker.JobWorkerDaemon"
 
+# The fully qualified name of the job worker configuration class
+CLASS_NAME_CONFIGURATION="$2"
+
 # PID file which contains the process identification number
 PID_FILE="$INSTALL_DIR/pid/$SERVICE_NAME.pid"
 
 # Log file for standard output
-LOG_STD_OUT="/var/log/$SERVICE_NAME/$SERVICE_NAME.out"
+LOG_STD_OUT="/var/log/$SERVICE_NAME/$SERVICE_NAME.log"
 
 # Log file for standard error output
-LOG_ERR_OUT="/var/log/$SERVICE_NAME/$SERVICE_NAME.err"
+LOG_ERR_OUT="/var/log/$SERVICE_NAME/$SERVICE_NAME.log"
 
 aws_codepipeline_job_worker()
 {
     cd $INSTALL_DIR
-    $JSVC_EXEC $1 -user $RUN_AS_USER -errfile $LOG_ERR_OUT -outfile $LOG_STD_OUT -pidfile $PID_FILE -home $JAVA_JRE_DIR -classpath $CLASS_PATH $CLASS_NAME_DAEMON
+    $JSVC_EXEC $1 -user $RUN_AS_USER -errfile $LOG_ERR_OUT -outfile $LOG_STD_OUT -pidfile $PID_FILE -home $JAVA_JRE_DIR -classpath $CLASS_PATH $CLASS_NAME_DAEMON $CLASS_NAME_CONFIGURATION
 }
 
 start()

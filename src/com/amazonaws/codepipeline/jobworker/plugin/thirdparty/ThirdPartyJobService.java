@@ -13,6 +13,7 @@ import com.amazonaws.codepipeline.jobworker.model.ExecutionDetails;
 import com.amazonaws.codepipeline.jobworker.model.FailureDetails;
 import com.amazonaws.codepipeline.jobworker.model.JobStatus;
 import com.amazonaws.codepipeline.jobworker.model.WorkItem;
+import com.amazonaws.codepipeline.jobworker.plugin.JobConverter;
 import com.amazonaws.services.codepipeline.AmazonCodePipelineClient;
 import com.amazonaws.services.codepipeline.model.AcknowledgeThirdPartyJobRequest;
 import com.amazonaws.services.codepipeline.model.AcknowledgeThirdPartyJobResult;
@@ -58,7 +59,7 @@ public class ThirdPartyJobService implements JobService {
      * @return List of work items.
      */
     public List<WorkItem> pollForJobs(final int maxBatchSize) {
-        LOGGER.debug(String.format("PollForThirdPartyJobs for action type %s", actionType));
+        LOGGER.debug(String.format("PollForThirdPartyJobs for action type '%s'", actionType));
         final List<WorkItem> result = new ArrayList<>();
 
         final PollForThirdPartyJobsRequest pollForJobsRequest = new PollForThirdPartyJobsRequest();
@@ -69,7 +70,7 @@ public class ThirdPartyJobService implements JobService {
         for (final ThirdPartyJob job : pollForJobsResult.getJobs()) {
             LOGGER.debug("GetThirdPartyJobDetails");
             final ThirdPartyJobDetails jobDetails = getJobDetails(job.getJobId(), job.getClientId());
-            result.add(ThirdPartyJobConverter.convert(job.getClientId(), jobDetails));
+            result.add(JobConverter.convert(job.getClientId(), jobDetails));
         }
         return result;
     }
@@ -83,7 +84,7 @@ public class ThirdPartyJobService implements JobService {
      * @return job status to indicate if the job worker should continue working on it
      */
     public JobStatus acknowledgeJob(final String jobId, final String clientId, final String nonce) {
-        LOGGER.debug(String.format("AcknowledgeThirdPartyJob %s with clientId %s and nonce %s", jobId, clientId, nonce));
+        LOGGER.debug(String.format("AcknowledgeThirdPartyJob for job '%s' with clientId '%s' and nonce '%s'", jobId, clientId, nonce));
         final AcknowledgeThirdPartyJobRequest request = new AcknowledgeThirdPartyJobRequest();
         request.setJobId(jobId);
         request.setNonce(nonce);
@@ -105,12 +106,12 @@ public class ThirdPartyJobService implements JobService {
                               final ExecutionDetails executionDetails,
                               final CurrentRevision currentRevision,
                               final String continuationToken) {
-        LOGGER.debug(String.format("PutThirdPartyJobSuccessResult %s", jobId));
+        LOGGER.debug(String.format("PutThirdPartyJobSuccessResult for job '%s'", jobId));
         final PutThirdPartyJobSuccessResultRequest request = new PutThirdPartyJobSuccessResultRequest();
         request.setJobId(jobId);
         request.setClientToken(clientTokenProvider.lookupClientSecret(clientId));
-        request.setExecutionDetails(ThirdPartyJobConverter.convert(executionDetails));
-        request.setCurrentRevision(ThirdPartyJobConverter.convert(currentRevision));
+        request.setExecutionDetails(JobConverter.convert(executionDetails));
+        request.setCurrentRevision(JobConverter.convert(currentRevision));
         request.setContinuationToken(continuationToken);
         codePipelineClient.putThirdPartyJobSuccessResult(request);
     }
@@ -122,11 +123,11 @@ public class ThirdPartyJobService implements JobService {
      * @param failureDetails failure details
      */
     public void putJobFailure(final String jobId, final String clientId, final FailureDetails failureDetails) {
-        LOGGER.debug(String.format("PutThirdPartyJobFailureResult %s", jobId));
+        LOGGER.debug(String.format("PutThirdPartyJobFailureResult for job '%s'", jobId));
         final PutThirdPartyJobFailureResultRequest request = new PutThirdPartyJobFailureResultRequest();
         request.setJobId(jobId);
         request.setClientToken(clientTokenProvider.lookupClientSecret(clientId));
-        request.setFailureDetails(ThirdPartyJobConverter.convert(failureDetails));
+        request.setFailureDetails(JobConverter.convert(failureDetails));
         codePipelineClient.putThirdPartyJobFailureResult(request);
     }
 
@@ -139,6 +140,6 @@ public class ThirdPartyJobService implements JobService {
     }
 
     private com.amazonaws.services.codepipeline.model.ActionType getActionType() {
-        return ThirdPartyJobConverter.convert(actionType);
+        return JobConverter.convert(actionType);
     }
 }

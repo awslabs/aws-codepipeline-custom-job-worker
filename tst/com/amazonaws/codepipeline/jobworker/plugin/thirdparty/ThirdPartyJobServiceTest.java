@@ -1,17 +1,13 @@
 package com.amazonaws.codepipeline.jobworker.plugin.thirdparty;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -22,20 +18,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.amazonaws.codepipeline.jobworker.JobService;
-import com.amazonaws.codepipeline.jobworker.model.AWSSessionCredentials;
 import com.amazonaws.codepipeline.jobworker.model.ActionType;
-import com.amazonaws.codepipeline.jobworker.model.Artifact;
 import com.amazonaws.codepipeline.jobworker.model.CurrentRevision;
 import com.amazonaws.codepipeline.jobworker.model.ExecutionDetails;
 import com.amazonaws.codepipeline.jobworker.model.FailureDetails;
 import com.amazonaws.codepipeline.jobworker.model.FailureType;
-import com.amazonaws.codepipeline.jobworker.model.JobData;
 import com.amazonaws.codepipeline.jobworker.model.JobStatus;
 import com.amazonaws.codepipeline.jobworker.model.WorkItem;
+import com.amazonaws.codepipeline.jobworker.plugin.JobAssertion;
 import com.amazonaws.services.codepipeline.AmazonCodePipelineClient;
 import com.amazonaws.services.codepipeline.model.AcknowledgeThirdPartyJobRequest;
 import com.amazonaws.services.codepipeline.model.AcknowledgeThirdPartyJobResult;
-import com.amazonaws.services.codepipeline.model.ActionConfiguration;
 import com.amazonaws.services.codepipeline.model.GetThirdPartyJobDetailsResult;
 import com.amazonaws.services.codepipeline.model.PollForThirdPartyJobsResult;
 import com.amazonaws.services.codepipeline.model.PutThirdPartyJobFailureResultRequest;
@@ -104,7 +97,7 @@ public class ThirdPartyJobServiceTest {
         assertEquals(thirdPartyJob.getJobId(), workItem.getJobId());
         assertEquals(thirdPartyJob.getClientId(), workItem.getClientId());
         assertEquals(getThirdPartyJobDetailsResult.getJobDetails().getNonce(), workItem.getJobNonce());
-        assertThirdPartyJobDataEquals(getThirdPartyJobDetailsResult.getJobDetails().getData(), workItem.getJobData());
+        JobAssertion.assertJobDataEquals(getThirdPartyJobDetailsResult.getJobDetails().getData(), workItem.getJobData());
     }
 
     @Test
@@ -199,7 +192,7 @@ public class ThirdPartyJobServiceTest {
     }
 
     private GetThirdPartyJobDetailsResult generateGetThirdPartyJobDetailsResult(final String jobId) {
-        com.amazonaws.services.codepipeline.model.ThirdPartyJobData jobData = new com.amazonaws.services.codepipeline.model.ThirdPartyJobData();
+        final com.amazonaws.services.codepipeline.model.ThirdPartyJobData jobData = new com.amazonaws.services.codepipeline.model.ThirdPartyJobData();
         jobData.setContinuationToken(UUID.randomUUID().toString());
 
         final ThirdPartyJobDetails thirdPartyJobDetails = new ThirdPartyJobDetails();
@@ -209,35 +202,5 @@ public class ThirdPartyJobServiceTest {
         final GetThirdPartyJobDetailsResult result = new GetThirdPartyJobDetailsResult();
         result.setJobDetails(thirdPartyJobDetails);
         return result;
-    }
-
-    private void assertThirdPartyJobDataEquals(final com.amazonaws.services.codepipeline.model.ThirdPartyJobData expectedJobData, final JobData actualJobData) {
-        assertEquals(expectedJobData.getContinuationToken(), actualJobData.getContinuationToken());
-        assertActionConfiguration(expectedJobData.getActionConfiguration(), actualJobData.getActionConfiguration());
-        assertArtifacts(expectedJobData.getInputArtifacts(), actualJobData.getInputArtifacts());
-        assertArtifacts(expectedJobData.getOutputArtifacts(), actualJobData.getOutputArtifacts());
-        assertArtifactCredentials(expectedJobData.getArtifactCredentials(), actualJobData.getArtifactCredentials());
-    }
-
-    private void assertArtifactCredentials(final com.amazonaws.services.codepipeline.model.AWSSessionCredentials expectedArtifactCredentials, final AWSSessionCredentials actualArtifactCredentials) {
-        if (expectedArtifactCredentials == null) {
-            assertNull(actualArtifactCredentials);
-        } else {
-            assertEquals(expectedArtifactCredentials.getAccessKeyId(), actualArtifactCredentials.getAccessKeyId());
-            assertEquals(expectedArtifactCredentials.getSecretAccessKey(), actualArtifactCredentials.getSecretAccessKey());
-            assertEquals(expectedArtifactCredentials.getSessionToken(), actualArtifactCredentials.getSessionToken());
-        }
-    }
-
-    private void assertActionConfiguration(final ActionConfiguration expectedActionConfiguration, final Map<String, String> actualActionConfiguration) {
-        if (expectedActionConfiguration == null || expectedActionConfiguration.getConfiguration() == null) {
-            assertEquals(0, actualActionConfiguration.size());
-        } else {
-            assertThat(expectedActionConfiguration.getConfiguration().entrySet(), equalTo(actualActionConfiguration.entrySet()));
-        }
-    }
-
-    private void assertArtifacts(final List<com.amazonaws.services.codepipeline.model.Artifact> expectedArtifacts, final List<Artifact> actualArtifacts) {
-        assertThat(expectedArtifacts, equalTo(actualArtifacts));
     }
 }
