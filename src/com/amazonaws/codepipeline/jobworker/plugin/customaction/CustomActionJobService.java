@@ -51,7 +51,7 @@ public class CustomActionJobService implements JobService {
      * @return List of work items.
      */
     public List<WorkItem> pollForJobs(final int maxBatchSize) {
-        LOGGER.debug(String.format("PollForJobs for action type %s", actionType));
+        LOGGER.info(String.format("PollForJobs for action type %s", actionType));
         final List<WorkItem> result = new ArrayList<>();
 
         final PollForJobsRequest pollForJobsRequest = new PollForJobsRequest();
@@ -74,7 +74,7 @@ public class CustomActionJobService implements JobService {
      * @return job status to indicate if the job worker should continue working on it
      */
     public JobStatus acknowledgeJob(final String jobId, final String clientId, final String nonce) {
-        LOGGER.debug(String.format("AcknowledgeJob for job '%s' and nonce '%s'", jobId, nonce));
+        LOGGER.info(String.format("AcknowledgeJob for job '%s' and nonce '%s'", jobId, nonce));
         final AcknowledgeJobRequest request = new AcknowledgeJobRequest();
         request.setJobId(jobId);
         request.setNonce(nonce);
@@ -95,7 +95,7 @@ public class CustomActionJobService implements JobService {
                               final ExecutionDetails executionDetails,
                               final CurrentRevision currentRevision,
                               final String continuationToken) {
-        LOGGER.debug(String.format("PutJobSuccessResult for job '%s'", jobId));
+        LOGGER.info(String.format("PutJobSuccessResult for job '%s'", jobId));
         final PutJobSuccessResultRequest request = new PutJobSuccessResultRequest();
         request.setJobId(jobId);
         request.setExecutionDetails(JobConverter.convert(executionDetails));
@@ -111,7 +111,7 @@ public class CustomActionJobService implements JobService {
      * @param failureDetails failure details
      */
     public void putJobFailure(final String jobId, final String clientId, final FailureDetails failureDetails) {
-        LOGGER.debug(String.format("PutJobFailureResult for job '%s'", jobId));
+        LOGGER.info(String.format("PutJobFailureResult for job '%s'", jobId));
         final PutJobFailureResultRequest request = new PutJobFailureResultRequest();
         request.setJobId(jobId);
         request.setFailureDetails(JobConverter.convert(failureDetails));

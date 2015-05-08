@@ -59,7 +59,7 @@ public class ThirdPartyJobService implements JobService {
      * @return List of work items.
      */
     public List<WorkItem> pollForJobs(final int maxBatchSize) {
-        LOGGER.debug(String.format("PollForThirdPartyJobs for action type '%s'", actionType));
+        LOGGER.info(String.format("PollForThirdPartyJobs for action type '%s'", actionType));
         final List<WorkItem> result = new ArrayList<>();
 
         final PollForThirdPartyJobsRequest pollForJobsRequest = new PollForThirdPartyJobsRequest();
@@ -68,7 +68,7 @@ public class ThirdPartyJobService implements JobService {
 
         final PollForThirdPartyJobsResult pollForJobsResult = codePipelineClient.pollForThirdPartyJobs(pollForJobsRequest);
         for (final ThirdPartyJob job : pollForJobsResult.getJobs()) {
-            LOGGER.debug("GetThirdPartyJobDetails");
+            LOGGER.info("GetThirdPartyJobDetails");
             final ThirdPartyJobDetails jobDetails = getJobDetails(job.getJobId(), job.getClientId());
             result.add(JobConverter.convert(job.getClientId(), jobDetails));
         }
@@ -84,7 +84,7 @@ public class ThirdPartyJobService implements JobService {
      * @return job status to indicate if the job worker should continue working on it
      */
     public JobStatus acknowledgeJob(final String jobId, final String clientId, final String nonce) {
-        LOGGER.debug(String.format("AcknowledgeThirdPartyJob for job '%s' with clientId '%s' and nonce '%s'", jobId, clientId, nonce));
+        LOGGER.info(String.format("AcknowledgeThirdPartyJob for job '%s' with clientId '%s' and nonce '%s'", jobId, clientId, nonce));
         final AcknowledgeThirdPartyJobRequest request = new AcknowledgeThirdPartyJobRequest();
         request.setJobId(jobId);
         request.setNonce(nonce);
@@ -106,7 +106,7 @@ public class ThirdPartyJobService implements JobService {
                               final ExecutionDetails executionDetails,
                               final CurrentRevision currentRevision,
                               final String continuationToken) {
-        LOGGER.debug(String.format("PutThirdPartyJobSuccessResult for job '%s'", jobId));
+        LOGGER.info(String.format("PutThirdPartyJobSuccessResult for job '%s'", jobId));
         final PutThirdPartyJobSuccessResultRequest request = new PutThirdPartyJobSuccessResultRequest();
         request.setJobId(jobId);
         request.setClientToken(clientTokenProvider.lookupClientSecret(clientId));
@@ -123,7 +123,7 @@ public class ThirdPartyJobService implements JobService {
      * @param failureDetails failure details
      */
     public void putJobFailure(final String jobId, final String clientId, final FailureDetails failureDetails) {
-        LOGGER.debug(String.format("PutThirdPartyJobFailureResult for job '%s'", jobId));
+        LOGGER.info(String.format("PutThirdPartyJobFailureResult for job '%s'", jobId));
         final PutThirdPartyJobFailureResultRequest request = new PutThirdPartyJobFailureResultRequest();
         request.setJobId(jobId);
         request.setClientToken(clientTokenProvider.lookupClientSecret(clientId));
