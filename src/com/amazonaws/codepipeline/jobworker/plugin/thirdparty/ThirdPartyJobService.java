@@ -1,3 +1,15 @@
+/*
+ * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in
+ * compliance with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package com.amazonaws.codepipeline.jobworker.plugin.thirdparty;
 
 import java.util.ArrayList;
@@ -58,6 +70,7 @@ public class ThirdPartyJobService implements JobService {
      * @param maxBatchSize maximum number of jobs to be returned by the poll api.
      * @return List of work items.
      */
+    @Override
     public List<WorkItem> pollForJobs(final int maxBatchSize) {
         LOGGER.info(String.format("PollForThirdPartyJobs for action type '%s'", actionType));
         final List<WorkItem> result = new ArrayList<>();
@@ -83,6 +96,7 @@ public class ThirdPartyJobService implements JobService {
      * @param nonce job nonce
      * @return job status to indicate if the job worker should continue working on it
      */
+    @Override
     public JobStatus acknowledgeJob(final String jobId, final String clientId, final String nonce) {
         LOGGER.info(String.format("AcknowledgeThirdPartyJob for job '%s' with clientId '%s' and nonce '%s'", jobId, clientId, nonce));
         final AcknowledgeThirdPartyJobRequest request = new AcknowledgeThirdPartyJobRequest();
@@ -101,6 +115,7 @@ public class ThirdPartyJobService implements JobService {
      * @param currentRevision current revision
      * @param continuationToken continuation token
      */
+    @Override
     public void putJobSuccess(final String jobId,
                               final String clientId,
                               final ExecutionDetails executionDetails,
@@ -122,6 +137,7 @@ public class ThirdPartyJobService implements JobService {
      * @param clientId client id
      * @param failureDetails failure details
      */
+    @Override
     public void putJobFailure(final String jobId, final String clientId, final FailureDetails failureDetails) {
         LOGGER.info(String.format("PutThirdPartyJobFailureResult for job '%s'", jobId));
         final PutThirdPartyJobFailureResultRequest request = new PutThirdPartyJobFailureResultRequest();

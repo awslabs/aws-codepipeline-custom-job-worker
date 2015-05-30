@@ -1,3 +1,15 @@
+/*
+ * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in
+ * compliance with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package com.amazonaws.codepipeline.jobworker;
 
 import java.util.concurrent.Executors;
@@ -51,6 +63,7 @@ public class JobWorkerDaemon implements Daemon {
      * @param context daemon context.
      * @throws DaemonInitException exception during initialization
      */
+    @Override
     public void init(final DaemonContext context) throws DaemonInitException {
         LOGGER.info("Initialize daemon.");
 
@@ -65,6 +78,7 @@ public class JobWorkerDaemon implements Daemon {
      * Starts the daemon. Initializes the executor service to execute the job poller at a fixed rate.
      * @throws Exception exception during start up
      */
+    @Override
     public void start() throws Exception {
         LOGGER.info("Starting up daemon.");
 
@@ -79,6 +93,7 @@ public class JobWorkerDaemon implements Daemon {
      * Waits until the job poller and job processors finished their work.
      * @throws Exception exception during shutdown
      */
+    @Override
     public void stop() throws Exception {
         LOGGER.info("Stopping daemon.");
 
@@ -90,7 +105,7 @@ public class JobWorkerDaemon implements Daemon {
                     throw new IllegalStateException("Failed graceful shutdown of executor threads");
                 }
             }
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             this.executorService.shutdownNow();
             Thread.currentThread().interrupt();
         }
@@ -100,6 +115,7 @@ public class JobWorkerDaemon implements Daemon {
     /**
      * Destroys the daemon.
      */
+    @Override
     public void destroy() {
         LOGGER.info("Destroying daemon.");
     }

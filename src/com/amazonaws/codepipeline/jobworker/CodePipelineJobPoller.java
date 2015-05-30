@@ -1,3 +1,15 @@
+/*
+ * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in
+ * compliance with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package com.amazonaws.codepipeline.jobworker;
 
 import java.util.List;
@@ -58,7 +70,7 @@ public class CodePipelineJobPoller implements JobPoller {
 
         final int batchSize = pollBatchSize - executorService.getActiveCount();
         if (batchSize > 0) {
-            int pollingBatchSize = Math.min(batchSize, pollBatchSize);
+            final int pollingBatchSize = Math.min(batchSize, pollBatchSize);
             LOGGER.debug("PollForJobs with batch size: " + pollingBatchSize);
             final List<WorkItem> workItems = jobService.pollForJobs(pollingBatchSize);
 
@@ -75,7 +87,7 @@ public class CodePipelineJobPoller implements JobPoller {
     private Runnable newProcessWorkItemRunnable(final WorkItem workItem) {
         return () -> {
             try {
-                JobStatus jobStatus = jobService.acknowledgeJob(workItem.getJobId(), workItem.getClientId(), workItem.getJobNonce());
+                final JobStatus jobStatus = jobService.acknowledgeJob(workItem.getJobId(), workItem.getClientId(), workItem.getJobNonce());
                 if (JobStatus.InProgress.equals(jobStatus)) {
                     LOGGER.info(String.format("Handing workItem for job %s to JobWorker", workItem.getJobId()));
                     final WorkResult result = jobProcessor.process(workItem);
@@ -85,7 +97,7 @@ public class CodePipelineJobPoller implements JobPoller {
                     LOGGER.warn(String.format("Cannot process work item since AcknowledgeJob for job %s with nonce %s returned status %s",
                             workItem.getJobId(), workItem.getJobNonce(), jobStatus));
                 }
-            } catch(RuntimeException e) {
+            } catch(final RuntimeException e) {
                 LOGGER.error(String.format("Error occurred processing work item for job %s", workItem.getJobId()), e);
             }
         };

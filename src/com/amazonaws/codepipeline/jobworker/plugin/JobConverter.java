@@ -1,3 +1,15 @@
+/*
+ * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in
+ * compliance with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package com.amazonaws.codepipeline.jobworker.plugin;
 
 import java.util.List;
@@ -94,7 +106,7 @@ public class JobConverter {
         String bucketName = null;
         String objectKey = null;
         if (artifact.getLocation() != null && artifact.getLocation().getS3Location() != null) {
-            S3ArtifactLocation s3ArtifactLocation = artifact.getLocation().getS3Location();
+            final S3ArtifactLocation s3ArtifactLocation = artifact.getLocation().getS3Location();
             bucketName = s3ArtifactLocation.getBucketName();
             objectKey = s3ArtifactLocation.getObjectKey();
         }
@@ -113,7 +125,7 @@ public class JobConverter {
         if (currentRevision == null) {
             return null;
         }
-        com.amazonaws.services.codepipeline.model.CurrentRevision result = new com.amazonaws.services.codepipeline.model.CurrentRevision();
+        final com.amazonaws.services.codepipeline.model.CurrentRevision result = new com.amazonaws.services.codepipeline.model.CurrentRevision();
         result.setChangeIdentifier(currentRevision.getChangeIdentifier());
         result.setRevision(currentRevision.getRevision());
         return result;
@@ -128,7 +140,7 @@ public class JobConverter {
         if (executionDetails == null) {
             return null;
         }
-        com.amazonaws.services.codepipeline.model.ExecutionDetails result = new com.amazonaws.services.codepipeline.model.ExecutionDetails();
+        final com.amazonaws.services.codepipeline.model.ExecutionDetails result = new com.amazonaws.services.codepipeline.model.ExecutionDetails();
         result.setExternalExecutionId(executionDetails.getExternalExecutionId());
         result.setSummary(executionDetails.getSummary());
         result.setPercentComplete(executionDetails.getPercentComplete());
@@ -141,7 +153,7 @@ public class JobConverter {
      * @return third party model failure details
      */
     public final static com.amazonaws.services.codepipeline.model.FailureDetails convert(final FailureDetails failureDetails) {
-        com.amazonaws.services.codepipeline.model.FailureDetails result = new com.amazonaws.services.codepipeline.model.FailureDetails();
+        final com.amazonaws.services.codepipeline.model.FailureDetails result = new com.amazonaws.services.codepipeline.model.FailureDetails();
         result.setType(failureDetails.getType().toString());
         result.setMessage(failureDetails.getMessage());
         return result;
@@ -153,7 +165,7 @@ public class JobConverter {
      * @return action type identifier (internal model)
      */
     public final static com.amazonaws.services.codepipeline.model.ActionType convert(final ActionType actionType) {
-        com.amazonaws.services.codepipeline.model.ActionType result = new com.amazonaws.services.codepipeline.model.ActionType();
+        final com.amazonaws.services.codepipeline.model.ActionType result = new com.amazonaws.services.codepipeline.model.ActionType();
         result.setCategory(actionType.getCategory());
         result.setOwner(actionType.getOwner());
         result.setProvider(actionType.getProvider());
