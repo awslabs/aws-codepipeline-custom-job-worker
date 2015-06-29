@@ -146,6 +146,22 @@ public class WorkResult {
      * An additional job will be scheduled to request status update on this asynchronous job.
      * @param jobId job id
      * @param executionDetails execution details
+     * @param continuationToken continuation token, indicates that the job is asynchronous and not finished yet.
+     *                          additional job will be scheduled to request status update.
+     * @return work result with success status.
+     */
+    public static WorkResult success(final String jobId,
+                                     final ExecutionDetails executionDetails,
+                                     final String continuationToken) {
+        return new WorkResult(jobId, executionDetails, null, continuationToken);
+    }
+
+    /**
+     * Initializes the work result with success status, current revision and continuation token.
+     * The continuation token indicates that the job is asynchronous and not finished yet.
+     * An additional job will be scheduled to request status update on this asynchronous job.
+     * @param jobId job id
+     * @param executionDetails execution details
      * @param currentRevision current revision
      * @param continuationToken continuation token, indicates that the job is asynchronous and not finished yet.
      *                          additional job will be scheduled to request status update.
