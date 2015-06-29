@@ -27,13 +27,13 @@ import com.amazonaws.services.codepipeline.AmazonCodePipelineClient;
 /**
  * Default implementation for the job worker configuration. Can be used as a base configuration for different
  * job service implementations. Only the implementation of the job service has to be provided.
- * By default: sets the polling interval to 1000 ms and starts 10 worker threads.
+ * By default: sets the polling interval to 30000 ms and starts 10 worker threads.
  */
 public abstract class DefaultJobWorkerConfiguration implements JobWorkerConfiguration {
     /**
      * The polling interval the daemon schedules the job poller which polls for new jobs.
      */
-    private static final long POLL_INTERVAL_MS = 1000L;
+    private static final long POLL_INTERVAL_MS = 30000L;
 
     /**
      * Number of worker threads. Indicates how many jobs can be processed in parallel.

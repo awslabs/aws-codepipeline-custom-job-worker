@@ -46,7 +46,7 @@ public ActionType getActionType() {
 }
 
 // How frequently the job worker polls for new jobs
-private static final long POLL_INTERVAL_MS = 5000L; // e.g. every 5 seconds
+private static final long POLL_INTERVAL_MS = 30000L; // e.g. every 30 seconds
 
 // Maximum number of worker threads. Indicates how many jobs can be processed in parallel.
 private static final int WORKER_THREADS = 10;

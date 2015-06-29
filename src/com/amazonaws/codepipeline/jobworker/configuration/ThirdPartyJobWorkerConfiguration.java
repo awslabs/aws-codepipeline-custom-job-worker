@@ -22,6 +22,10 @@ import com.amazonaws.codepipeline.jobworker.plugin.thirdparty.ThirdPartyJobServi
  * Configuration class for settings and dependencies of the third party job worker.
  */
 public class ThirdPartyJobWorkerConfiguration extends DefaultJobWorkerConfiguration {
+    /**
+     * The polling interval the daemon schedules the job poller which polls for new jobs.
+     */
+    private static final long POLL_INTERVAL_MS = 1000L;
 
     /**
      * Action type this job worker is polling and processing jobs for.
@@ -36,6 +40,14 @@ public class ThirdPartyJobWorkerConfiguration extends DefaultJobWorkerConfigurat
      */
     @Override
     public JobService jobService() { return new ThirdPartyJobService(codePipelineClient(), getActionType(), clientTokenProvider()); }
+
+    /**
+     * @return the poll interval in milliseconds
+     */
+    @Override
+    public long getPollingIntervalInMs() {
+        return POLL_INTERVAL_MS;
+    }
 
     /**
      * @return client token provider implementation

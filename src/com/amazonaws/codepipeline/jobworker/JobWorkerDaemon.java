@@ -39,7 +39,7 @@ public class JobWorkerDaemon implements Daemon {
     /**
      * Initializes the daemon with default settings:
      * Scheduled Thread Pool with pool size 1 to invoke job poller on a fixed rate.
-     * (Default every second)
+     * (Default every 30 seconds)
      * Uses third party action configuration as a default.
      */
     public JobWorkerDaemon() {

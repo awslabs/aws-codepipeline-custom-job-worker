@@ -33,7 +33,7 @@ import com.amazonaws.codepipeline.jobworker.configuration.JobWorkerConfiguration
 
 public class JobWorkerDaemonTest {
 
-    private static final long POLL_INTERVAL_MS = 1000L;
+    private static final long POLL_INTERVAL_MS = 30000L;
 
     @Mock
     private ScheduledExecutorService executorService;
