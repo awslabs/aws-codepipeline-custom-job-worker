@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 
 import com.amazonaws.codepipeline.jobworker.JobService;
 import com.amazonaws.codepipeline.jobworker.Validator;
-import com.amazonaws.codepipeline.jobworker.model.ActionType;
+import com.amazonaws.codepipeline.jobworker.model.ActionTypeId;
 import com.amazonaws.codepipeline.jobworker.model.CurrentRevision;
 import com.amazonaws.codepipeline.jobworker.model.ExecutionDetails;
 import com.amazonaws.codepipeline.jobworker.model.FailureDetails;
@@ -42,19 +42,19 @@ public class CustomActionJobService implements JobService {
     private static final Logger LOGGER = Logger.getLogger(CustomActionJobService.class);
 
     private final AmazonCodePipelineClient codePipelineClient;
-    private final ActionType actionType;
+    private final ActionTypeId actionTypeId;
 
     /**
      * Initializes the custom action job service wrapper.
      * @param codePipelineClient service client for the AWS CodePipeline api.
-     * @param actionType action type to poll for.
+     * @param actionTypeId action type id to poll for.
      */
-    public CustomActionJobService(final AmazonCodePipelineClient codePipelineClient, final ActionType actionType) {
+    public CustomActionJobService(final AmazonCodePipelineClient codePipelineClient, final ActionTypeId actionTypeId) {
         Validator.notNull(codePipelineClient);
-        Validator.notNull(actionType);
+        Validator.notNull(actionTypeId);
 
         this.codePipelineClient = codePipelineClient;
-        this.actionType = actionType;
+        this.actionTypeId = actionTypeId;
     }
 
     /**
@@ -64,11 +64,11 @@ public class CustomActionJobService implements JobService {
      */
     @Override
     public List<WorkItem> pollForJobs(final int maxBatchSize) {
-        LOGGER.info(String.format("PollForJobs for action type %s", actionType));
+        LOGGER.info(String.format("PollForJobs for action type id %s", actionTypeId));
         final List<WorkItem> result = new ArrayList<>();
 
         final PollForJobsRequest pollForJobsRequest = new PollForJobsRequest();
-        pollForJobsRequest.setActionType(getActionType());
+        pollForJobsRequest.setActionTypeId(getActionTypeId());
         pollForJobsRequest.setMaxBatchSize(maxBatchSize);
 
         final PollForJobsResult pollForJobsResult = codePipelineClient.pollForJobs(pollForJobsRequest);
@@ -134,7 +134,7 @@ public class CustomActionJobService implements JobService {
         codePipelineClient.putJobFailureResult(request);
     }
 
-    private com.amazonaws.services.codepipeline.model.ActionType getActionType() {
-        return JobConverter.convert(actionType);
+    private com.amazonaws.services.codepipeline.model.ActionTypeId getActionTypeId() {
+        return JobConverter.convert(actionTypeId);
     }
 }

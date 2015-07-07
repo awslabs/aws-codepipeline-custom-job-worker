@@ -20,6 +20,7 @@ import com.amazonaws.codepipeline.jobworker.Validator;
 public class FailureDetails {
     private final FailureType type;
     private final String message;
+    private final String externalExecutionId;
 
     /**
      * Initializes the failure details to report the reason for the job failure.
@@ -29,6 +30,7 @@ public class FailureDetails {
         Validator.notNull(type);
         this.type = type;
         this.message = null;
+        this.externalExecutionId = null;
     }
 
     /**
@@ -40,6 +42,20 @@ public class FailureDetails {
         Validator.notNull(type);
         this.type = type;
         this.message = message;
+        this.externalExecutionId = null;
+    }
+
+    /**
+     * Initializes the failure details to report the reason for the job failure.
+     * @param type failure type / failure class
+     * @param message message indicating why the job failed
+     * @param externalExecutionId the id of the external execution.
+     */
+    public FailureDetails(final FailureType type, final String message, final String externalExecutionId) {
+        Validator.notNull(type);
+        this.type = type;
+        this.message = message;
+        this.externalExecutionId = externalExecutionId;
     }
 
     /**
@@ -54,5 +70,12 @@ public class FailureDetails {
      */
     public String getMessage() {
         return message;
+    }
+
+    /**
+     * @return the id of the external execution.
+     */
+    public String getExternalExecutionId() {
+        return externalExecutionId;
     }
 }

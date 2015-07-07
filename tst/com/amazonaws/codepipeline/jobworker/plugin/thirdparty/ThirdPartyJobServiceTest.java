@@ -30,7 +30,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.amazonaws.codepipeline.jobworker.JobService;
-import com.amazonaws.codepipeline.jobworker.model.ActionType;
+import com.amazonaws.codepipeline.jobworker.model.ActionTypeId;
 import com.amazonaws.codepipeline.jobworker.model.CurrentRevision;
 import com.amazonaws.codepipeline.jobworker.model.ExecutionDetails;
 import com.amazonaws.codepipeline.jobworker.model.FailureDetails;
@@ -51,7 +51,7 @@ import com.amazonaws.services.codepipeline.model.ThirdPartyJobDetails;
 public class ThirdPartyJobServiceTest {
 
     private JobService jobService;
-    private final ActionType actionType = new ActionType("Build", "ThirdParty", "MyProvider", "1.0");
+    private final ActionTypeId actionTypeId = new ActionTypeId("Build", "ThirdParty", "MyProvider", "1.0");
 
     @Mock
     private AmazonCodePipelineClient codePipelineClient;
@@ -68,22 +68,22 @@ public class ThirdPartyJobServiceTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        jobService = new ThirdPartyJobService(codePipelineClient, actionType, new DefaultClientTokenProvider());
+        jobService = new ThirdPartyJobService(codePipelineClient, actionTypeId, new DefaultClientTokenProvider());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowWhenCodePipelineClientIsNull() {
-        new ThirdPartyJobService(null, actionType, new DefaultClientTokenProvider());
+        new ThirdPartyJobService(null, actionTypeId, new DefaultClientTokenProvider());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowWhenActionTypeIsNull() {
+    public void shouldThrowWhenActionTypeIdIsNull() {
         new ThirdPartyJobService(codePipelineClient, null, new DefaultClientTokenProvider());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowWhenClientTokenProviderIsNull() {
-        new ThirdPartyJobService(codePipelineClient, actionType, null);
+        new ThirdPartyJobService(codePipelineClient, actionTypeId, null);
     }
 
     @Test

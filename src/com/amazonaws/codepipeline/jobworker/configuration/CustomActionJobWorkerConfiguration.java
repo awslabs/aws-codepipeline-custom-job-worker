@@ -13,7 +13,7 @@
 package com.amazonaws.codepipeline.jobworker.configuration;
 
 import com.amazonaws.codepipeline.jobworker.JobService;
-import com.amazonaws.codepipeline.jobworker.model.ActionType;
+import com.amazonaws.codepipeline.jobworker.model.ActionTypeId;
 import com.amazonaws.codepipeline.jobworker.plugin.customaction.CustomActionJobService;
 
 /**
@@ -25,13 +25,13 @@ public class CustomActionJobWorkerConfiguration extends DefaultJobWorkerConfigur
      * Action type this job worker is polling and processing jobs for.
      * @return action type identifier
      */
-    public ActionType getActionType() {
-        return new ActionType("Deploy", "Custom", "MyCustomAction", "1");
+    public ActionTypeId getActionTypeId() {
+        return new ActionTypeId("Deploy", "Custom", "MyCustomAction", "1");
     }
 
     /**
      * @return job service implementation fpr the custom action API.
      */
     @Override
-    public JobService jobService() { return new CustomActionJobService(codePipelineClient(), getActionType()); }
+    public JobService jobService() { return new CustomActionJobService(codePipelineClient(), getActionTypeId()); }
 }

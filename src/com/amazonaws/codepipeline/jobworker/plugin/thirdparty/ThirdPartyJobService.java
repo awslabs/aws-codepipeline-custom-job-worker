@@ -18,7 +18,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.amazonaws.codepipeline.jobworker.Validator;
-import com.amazonaws.codepipeline.jobworker.model.ActionType;
+import com.amazonaws.codepipeline.jobworker.model.ActionTypeId;
 import com.amazonaws.codepipeline.jobworker.JobService;
 import com.amazonaws.codepipeline.jobworker.model.CurrentRevision;
 import com.amazonaws.codepipeline.jobworker.model.ExecutionDetails;
@@ -45,23 +45,23 @@ public class ThirdPartyJobService implements JobService {
     private static final Logger LOGGER = Logger.getLogger(ThirdPartyJobService.class);
 
     private final AmazonCodePipelineClient codePipelineClient;
-    private final ActionType actionType;
+    private final ActionTypeId actionTypeId;
     private final ClientTokenProvider clientTokenProvider;
 
     /**
      * Initializes the third party job service wrapper.
      * @param codePipelineClient service client for the AWS CodePipeline api.
-     * @param actionType action type to poll for.
+     * @param actionTypeId action type to poll for.
      * @param clientTokenProvider client token provider to look up client token by client id
      *                            in order to get the job details.
      */
-    public ThirdPartyJobService(final AmazonCodePipelineClient codePipelineClient, final ActionType actionType, final ClientTokenProvider clientTokenProvider) {
+    public ThirdPartyJobService(final AmazonCodePipelineClient codePipelineClient, final ActionTypeId actionTypeId, final ClientTokenProvider clientTokenProvider) {
         Validator.notNull(codePipelineClient);
-        Validator.notNull(actionType);
+        Validator.notNull(actionTypeId);
         Validator.notNull(clientTokenProvider);
 
         this.codePipelineClient = codePipelineClient;
-        this.actionType = actionType;
+        this.actionTypeId = actionTypeId;
         this.clientTokenProvider = clientTokenProvider;
     }
 
@@ -72,11 +72,11 @@ public class ThirdPartyJobService implements JobService {
      */
     @Override
     public List<WorkItem> pollForJobs(final int maxBatchSize) {
-        LOGGER.info(String.format("PollForThirdPartyJobs for action type '%s'", actionType));
+        LOGGER.info(String.format("PollForThirdPartyJobs for action type id '%s'", actionTypeId));
         final List<WorkItem> result = new ArrayList<>();
 
         final PollForThirdPartyJobsRequest pollForJobsRequest = new PollForThirdPartyJobsRequest();
-        pollForJobsRequest.setActionType(getActionType());
+        pollForJobsRequest.setActionTypeId(getActionTypeId());
         pollForJobsRequest.setMaxBatchSize(maxBatchSize);
 
         final PollForThirdPartyJobsResult pollForJobsResult = codePipelineClient.pollForThirdPartyJobs(pollForJobsRequest);
@@ -155,7 +155,7 @@ public class ThirdPartyJobService implements JobService {
         return getJobDetailsResult.getJobDetails();
     }
 
-    private com.amazonaws.services.codepipeline.model.ActionType getActionType() {
-        return JobConverter.convert(actionType);
+    private com.amazonaws.services.codepipeline.model.ActionTypeId getActionTypeId() {
+        return JobConverter.convert(actionTypeId);
     }
 }

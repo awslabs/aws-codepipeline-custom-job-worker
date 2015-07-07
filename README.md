@@ -35,9 +35,9 @@ The job worker comes with two pre-defined configuration classes: `CustomActionJo
 
 You can configure the following settings:
 ```java
-// Configure action type the job worker polls for
-public ActionType getActionType() {
-    return new ActionType(
+// Configure action type id the job worker polls for
+public ActionTypeId getActionTypeId() {
+    return new ActionTypeId(
         "Deploy",          // Action Type Category: Source, Build, Test, Deploy, Invoke
         "Custom",          // Action Type Owner: Custom or ThirdParty
         "MyCustomAction",  // Action Type Provider: Name of your action type

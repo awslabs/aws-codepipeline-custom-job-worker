@@ -17,20 +17,20 @@ import com.amazonaws.codepipeline.jobworker.Validator;
 /**
  * Action type uniquely identifies a specific action which can be used in pipelines.
  */
-public class ActionType {
+public class ActionTypeId {
     private final String category;
     private final String owner;
     private final String provider;
     private final String version;
 
     /**
-     * Initializes the action type
+     * Initializes the action type id.
      * @param category action category (Source, Build, Test, Deploy, etc...)
      * @param owner action owner (AWS, ThirdParty or CustomAction)
      * @param provider action provider (CodeDeploy, ElasticBeanstalk, OpsWorks, etc...)
      * @param version action version
      */
-    public ActionType(final String category, final String owner, final String provider, final String version) {
+    public ActionTypeId(final String category, final String owner, final String provider, final String version) {
         Validator.notNull(category);
         Validator.notNull(owner);
         Validator.notNull(provider);

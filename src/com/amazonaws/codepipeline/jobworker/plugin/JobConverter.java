@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.amazonaws.codepipeline.jobworker.model.AWSSessionCredentials;
-import com.amazonaws.codepipeline.jobworker.model.ActionType;
+import com.amazonaws.codepipeline.jobworker.model.ActionTypeId;
 import com.amazonaws.codepipeline.jobworker.model.Artifact;
 import com.amazonaws.codepipeline.jobworker.model.CurrentRevision;
 import com.amazonaws.codepipeline.jobworker.model.ExecutionDetails;
@@ -161,15 +161,15 @@ public class JobConverter {
 
     /**
      * Converts the third party action type structure into the internal job worker structure.
-     * @param actionType action type identifier
+     * @param actionTypeId action type identifier
      * @return action type identifier (internal model)
      */
-    public final static com.amazonaws.services.codepipeline.model.ActionType convert(final ActionType actionType) {
-        final com.amazonaws.services.codepipeline.model.ActionType result = new com.amazonaws.services.codepipeline.model.ActionType();
-        result.setCategory(actionType.getCategory());
-        result.setOwner(actionType.getOwner());
-        result.setProvider(actionType.getProvider());
-        result.setVersion(actionType.getVersion());
+    public final static com.amazonaws.services.codepipeline.model.ActionTypeId convert(final ActionTypeId actionTypeId) {
+        final com.amazonaws.services.codepipeline.model.ActionTypeId result = new com.amazonaws.services.codepipeline.model.ActionTypeId();
+        result.setCategory(actionTypeId.getCategory());
+        result.setOwner(actionTypeId.getOwner());
+        result.setProvider(actionTypeId.getProvider());
+        result.setVersion(actionTypeId.getVersion());
         return result;
     }
 }
