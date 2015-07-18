@@ -80,6 +80,16 @@ public final class JobAssertion {
     }
 
     private static void assertArtifacts(final List<Artifact> expectedArtifacts, final List<com.amazonaws.codepipeline.jobworker.model.Artifact> actualArtifacts) {
-        assertThat(expectedArtifacts, equalTo(actualArtifacts));
+        assertEquals(expectedArtifacts.size(), actualArtifacts.size());
+        for(int i = 0; i < expectedArtifacts.size(); i++) {
+            assertArtifact(expectedArtifacts.get(i), actualArtifacts.get(i));
+        }
+    }
+
+    private static void assertArtifact(final Artifact expectedArtifact, final com.amazonaws.codepipeline.jobworker.model.Artifact actualArtifact) {
+        assertEquals(expectedArtifact.getName(), actualArtifact.getName());
+        assertEquals(expectedArtifact.getRevision(), actualArtifact.getRevision());
+        assertEquals(expectedArtifact.getLocation().getS3Location().getBucketName(), actualArtifact.getS3BucketName());
+        assertEquals(expectedArtifact.getLocation().getS3Location().getObjectKey(), actualArtifact.getS3ObjectKey());
     }
 }

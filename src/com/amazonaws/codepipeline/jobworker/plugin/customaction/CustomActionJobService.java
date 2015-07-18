@@ -26,7 +26,7 @@ import com.amazonaws.codepipeline.jobworker.model.FailureDetails;
 import com.amazonaws.codepipeline.jobworker.model.JobStatus;
 import com.amazonaws.codepipeline.jobworker.model.WorkItem;
 import com.amazonaws.codepipeline.jobworker.plugin.JobConverter;
-import com.amazonaws.services.codepipeline.AmazonCodePipelineClient;
+import com.amazonaws.services.codepipeline.AWSCodePipeline;
 import com.amazonaws.services.codepipeline.model.AcknowledgeJobRequest;
 import com.amazonaws.services.codepipeline.model.AcknowledgeJobResult;
 import com.amazonaws.services.codepipeline.model.Job;
@@ -41,7 +41,7 @@ import com.amazonaws.services.codepipeline.model.PutJobSuccessResultRequest;
 public class CustomActionJobService implements JobService {
     private static final Logger LOGGER = Logger.getLogger(CustomActionJobService.class);
 
-    private final AmazonCodePipelineClient codePipelineClient;
+    private final AWSCodePipeline codePipelineClient;
     private final ActionTypeId actionTypeId;
 
     /**
@@ -49,7 +49,7 @@ public class CustomActionJobService implements JobService {
      * @param codePipelineClient service client for the AWS CodePipeline api.
      * @param actionTypeId action type id to poll for.
      */
-    public CustomActionJobService(final AmazonCodePipelineClient codePipelineClient, final ActionTypeId actionTypeId) {
+    public CustomActionJobService(final AWSCodePipeline codePipelineClient, final ActionTypeId actionTypeId) {
         Validator.notNull(codePipelineClient);
         Validator.notNull(actionTypeId);
 

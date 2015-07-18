@@ -38,13 +38,17 @@ import com.amazonaws.codepipeline.jobworker.model.FailureType;
 import com.amazonaws.codepipeline.jobworker.model.JobStatus;
 import com.amazonaws.codepipeline.jobworker.model.WorkItem;
 import com.amazonaws.codepipeline.jobworker.plugin.JobAssertion;
-import com.amazonaws.services.codepipeline.AmazonCodePipelineClient;
+import com.amazonaws.codepipeline.jobworker.plugin.JobDataGenerator;
+import com.amazonaws.services.codepipeline.AWSCodePipeline;
 import com.amazonaws.services.codepipeline.model.AcknowledgeThirdPartyJobRequest;
 import com.amazonaws.services.codepipeline.model.AcknowledgeThirdPartyJobResult;
+import com.amazonaws.services.codepipeline.model.Artifact;
+import com.amazonaws.services.codepipeline.model.ArtifactLocation;
 import com.amazonaws.services.codepipeline.model.GetThirdPartyJobDetailsResult;
 import com.amazonaws.services.codepipeline.model.PollForThirdPartyJobsResult;
 import com.amazonaws.services.codepipeline.model.PutThirdPartyJobFailureResultRequest;
 import com.amazonaws.services.codepipeline.model.PutThirdPartyJobSuccessResultRequest;
+import com.amazonaws.services.codepipeline.model.S3ArtifactLocation;
 import com.amazonaws.services.codepipeline.model.ThirdPartyJob;
 import com.amazonaws.services.codepipeline.model.ThirdPartyJobDetails;
 
@@ -54,7 +58,7 @@ public class ThirdPartyJobServiceTest {
     private final ActionTypeId actionTypeId = new ActionTypeId("Build", "ThirdParty", "MyProvider", "1.0");
 
     @Mock
-    private AmazonCodePipelineClient codePipelineClient;
+    private AWSCodePipeline codePipelineClient;
 
     @Captor
     private ArgumentCaptor<PutThirdPartyJobSuccessResultRequest> putThirdPartyJobSuccessResultRequestCaptor;
@@ -206,6 +210,12 @@ public class ThirdPartyJobServiceTest {
     private GetThirdPartyJobDetailsResult generateGetThirdPartyJobDetailsResult(final String jobId) {
         final com.amazonaws.services.codepipeline.model.ThirdPartyJobData jobData = new com.amazonaws.services.codepipeline.model.ThirdPartyJobData();
         jobData.setContinuationToken(UUID.randomUUID().toString());
+        jobData.setInputArtifacts(Arrays.asList(JobDataGenerator.generateArtifact()));
+        jobData.setOutputArtifacts(Arrays.asList(JobDataGenerator.generateArtifact()));
+        jobData.setActionConfiguration(JobDataGenerator.generateActionConfiguration());
+        jobData.setPipelineContext(JobDataGenerator.generatePipelineContext());
+        jobData.setActionTypeId(JobDataGenerator.generateActionTypeId());
+        jobData.setArtifactCredentials(JobDataGenerator.generateAWSSessionCredentials());
 
         final ThirdPartyJobDetails thirdPartyJobDetails = new ThirdPartyJobDetails();
         thirdPartyJobDetails.setId(jobId);

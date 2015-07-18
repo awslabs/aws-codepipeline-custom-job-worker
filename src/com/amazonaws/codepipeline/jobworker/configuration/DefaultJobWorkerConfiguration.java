@@ -22,7 +22,8 @@ import com.amazonaws.codepipeline.jobworker.JobProcessor;
 import com.amazonaws.codepipeline.jobworker.JobService;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.codepipeline.AmazonCodePipelineClient;
+import com.amazonaws.services.codepipeline.AWSCodePipeline;
+import com.amazonaws.services.codepipeline.AWSCodePipelineClient;
 
 /**
  * Default implementation for the job worker configuration. Can be used as a base configuration for different
@@ -76,8 +77,8 @@ public abstract class DefaultJobWorkerConfiguration implements JobWorkerConfigur
     /**
      * @return code pipeline client implementation
      */
-    protected AmazonCodePipelineClient codePipelineClient() {
-        final AmazonCodePipelineClient codePipelineClient = new AmazonCodePipelineClient();
+    protected AWSCodePipeline codePipelineClient() {
+        final AWSCodePipeline codePipelineClient = new AWSCodePipelineClient();
         codePipelineClient.setRegion(AWS_REGION);
         return codePipelineClient;
     }

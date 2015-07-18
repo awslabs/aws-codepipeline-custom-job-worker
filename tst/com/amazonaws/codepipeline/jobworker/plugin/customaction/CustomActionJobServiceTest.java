@@ -38,13 +38,17 @@ import com.amazonaws.codepipeline.jobworker.model.FailureType;
 import com.amazonaws.codepipeline.jobworker.model.JobStatus;
 import com.amazonaws.codepipeline.jobworker.model.WorkItem;
 import com.amazonaws.codepipeline.jobworker.plugin.JobAssertion;
-import com.amazonaws.services.codepipeline.AmazonCodePipelineClient;
+import com.amazonaws.codepipeline.jobworker.plugin.JobDataGenerator;
+import com.amazonaws.services.codepipeline.AWSCodePipeline;
 import com.amazonaws.services.codepipeline.model.AcknowledgeJobRequest;
 import com.amazonaws.services.codepipeline.model.AcknowledgeJobResult;
+import com.amazonaws.services.codepipeline.model.Artifact;
+import com.amazonaws.services.codepipeline.model.ArtifactLocation;
 import com.amazonaws.services.codepipeline.model.Job;
 import com.amazonaws.services.codepipeline.model.PollForJobsResult;
 import com.amazonaws.services.codepipeline.model.PutJobFailureResultRequest;
 import com.amazonaws.services.codepipeline.model.PutJobSuccessResultRequest;
+import com.amazonaws.services.codepipeline.model.S3ArtifactLocation;
 
 public class CustomActionJobServiceTest {
 
@@ -52,7 +56,7 @@ public class CustomActionJobServiceTest {
     private final ActionTypeId actionTypeId = new ActionTypeId("Build", "Custom", "MyCustomAction", "1.0");
 
     @Mock
-    private AmazonCodePipelineClient codePipelineClient;
+    private AWSCodePipeline codePipelineClient;
 
     @Captor
     private ArgumentCaptor<PutJobSuccessResultRequest> putJobSuccessResultRequestCaptor;
@@ -183,6 +187,12 @@ public class CustomActionJobServiceTest {
     private PollForJobsResult generatePollForJobsResult() {
         final com.amazonaws.services.codepipeline.model.JobData jobData = new com.amazonaws.services.codepipeline.model.JobData();
         jobData.setContinuationToken(UUID.randomUUID().toString());
+        jobData.setInputArtifacts(Arrays.asList(JobDataGenerator.generateArtifact()));
+        jobData.setOutputArtifacts(Arrays.asList(JobDataGenerator.generateArtifact()));
+        jobData.setActionConfiguration(JobDataGenerator.generateActionConfiguration());
+        jobData.setPipelineContext(JobDataGenerator.generatePipelineContext());
+        jobData.setActionTypeId(JobDataGenerator.generateActionTypeId());
+        jobData.setArtifactCredentials(JobDataGenerator.generateAWSSessionCredentials());
 
         final Job job = new Job();
         job.setId(UUID.randomUUID().toString());

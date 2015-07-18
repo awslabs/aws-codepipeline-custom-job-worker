@@ -26,7 +26,7 @@ import com.amazonaws.codepipeline.jobworker.model.FailureDetails;
 import com.amazonaws.codepipeline.jobworker.model.JobStatus;
 import com.amazonaws.codepipeline.jobworker.model.WorkItem;
 import com.amazonaws.codepipeline.jobworker.plugin.JobConverter;
-import com.amazonaws.services.codepipeline.AmazonCodePipelineClient;
+import com.amazonaws.services.codepipeline.AWSCodePipeline;
 import com.amazonaws.services.codepipeline.model.AcknowledgeThirdPartyJobRequest;
 import com.amazonaws.services.codepipeline.model.AcknowledgeThirdPartyJobResult;
 import com.amazonaws.services.codepipeline.model.GetThirdPartyJobDetailsRequest;
@@ -44,7 +44,7 @@ import com.amazonaws.services.codepipeline.model.ThirdPartyJobDetails;
 public class ThirdPartyJobService implements JobService {
     private static final Logger LOGGER = Logger.getLogger(ThirdPartyJobService.class);
 
-    private final AmazonCodePipelineClient codePipelineClient;
+    private final AWSCodePipeline codePipelineClient;
     private final ActionTypeId actionTypeId;
     private final ClientTokenProvider clientTokenProvider;
 
@@ -55,7 +55,7 @@ public class ThirdPartyJobService implements JobService {
      * @param clientTokenProvider client token provider to look up client token by client id
      *                            in order to get the job details.
      */
-    public ThirdPartyJobService(final AmazonCodePipelineClient codePipelineClient, final ActionTypeId actionTypeId, final ClientTokenProvider clientTokenProvider) {
+    public ThirdPartyJobService(final AWSCodePipeline codePipelineClient, final ActionTypeId actionTypeId, final ClientTokenProvider clientTokenProvider) {
         Validator.notNull(codePipelineClient);
         Validator.notNull(actionTypeId);
         Validator.notNull(clientTokenProvider);
