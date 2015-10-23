@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 
 import com.amazonaws.codepipeline.jobworker.configuration.CustomActionJobWorkerConfiguration;
 import com.amazonaws.codepipeline.jobworker.configuration.JobWorkerConfiguration;
+import com.amazonaws.codepipeline.jobworker.model.RegionNotFoundException;
 
 /**
  * The daemon schedules the poller at a fixed time rate.
@@ -136,7 +137,8 @@ public class JobWorkerDaemon implements Daemon {
             try {
                 final JobWorkerConfiguration jobWorkerConfiguration = (JobWorkerConfiguration) Class.forName(configurationClassName).newInstance();
                 initConfiguration(jobWorkerConfiguration);
-            } catch (final InstantiationException | IllegalAccessException | ClassNotFoundException | ClassCastException e) {
+            } catch (final InstantiationException | IllegalAccessException |
+                    ClassNotFoundException | ClassCastException | RegionNotFoundException e) {
                 throw new DaemonInitException(
                         String.format("Provided job worker configuration class '%s' could not be loaded.", configurationClassName),
                         e);

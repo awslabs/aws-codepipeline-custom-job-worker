@@ -50,9 +50,16 @@ private static final long POLL_INTERVAL_MS = 30000L; // e.g. every 30 seconds
 
 // Maximum number of worker threads. Indicates how many jobs can be processed in parallel.
 private static final int WORKER_THREADS = 10;
+```
 
-// The AWS region of AWS CodePipeline. The job worker polls for jobs in this region.
-private static final Region AWS_REGION = Region.getRegion(Regions.US_EAST_1);
+### AWS Region
+* The AWS region for the custom job worker can be set with the `AWS_REGION` environment variable, and it will poll for jobs in this region.
+* If the environment variable is not set, then the custom job worker will try to use the region of the EC2 instance on which it is running.
+* You can also modify `getRegion()` method in `DefaultJobWorkerConfiguration.java`.
+```java
+    private static Region getRegion() {
+        return Region.getRegion(Regions.US_EAST_1);
+    }
 ```
 
 ## Deployment

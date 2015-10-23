@@ -30,10 +30,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.amazonaws.codepipeline.jobworker.configuration.JobWorkerConfiguration;
+import com.amazonaws.regions.Regions;
 
 public class JobWorkerDaemonTest {
 
     private static final long POLL_INTERVAL_MS = 30000L;
+    private static final String AWS_REGION = "AWS_REGION";
+    private static final String US_EAST_1 = Regions.US_EAST_1.getName();
 
     @Mock
     private ScheduledExecutorService executorService;
@@ -84,6 +87,7 @@ public class JobWorkerDaemonTest {
     @Test
     public void shouldLoadCustomActionConfiguration() throws Exception {
         // given
+        System.setProperty(AWS_REGION, US_EAST_1);
         when(daemonContext.getArguments()).thenReturn(
                 new String[] { "com.amazonaws.codepipeline.jobworker.configuration.CustomActionJobWorkerConfiguration" });
 
@@ -94,6 +98,7 @@ public class JobWorkerDaemonTest {
     @Test
     public void shouldLoadThirdPartyConfiguration() throws Exception {
         // given
+        System.setProperty(AWS_REGION, US_EAST_1);
         when(daemonContext.getArguments()).thenReturn(
                 new String[] { "com.amazonaws.codepipeline.jobworker.configuration.ThirdPartyJobWorkerConfiguration" });
 
@@ -105,6 +110,17 @@ public class JobWorkerDaemonTest {
     public void shouldThrowOnInitIfNonExistentClassProvided() throws Exception {
         // given
         when(daemonContext.getArguments()).thenReturn(new String[] { "non-existent-class" });
+
+        // when
+        jobWorkerDaemon.init(daemonContext);
+    }
+
+    @Test(expected = DaemonInitException.class)
+    public void shouldThrowOnInitIfInvalidRegion() throws Exception {
+        // given
+        System.setProperty(AWS_REGION, "invalid");
+        when(daemonContext.getArguments()).thenReturn(
+                new String[] { "com.amazonaws.codepipeline.jobworker.configuration.ThirdPartyJobWorkerConfiguration" });
 
         // when
         jobWorkerDaemon.init(daemonContext);

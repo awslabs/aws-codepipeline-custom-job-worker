@@ -20,10 +20,12 @@ import com.amazonaws.codepipeline.jobworker.CodePipelineJobProcessor;
 import com.amazonaws.codepipeline.jobworker.JobPoller;
 import com.amazonaws.codepipeline.jobworker.JobProcessor;
 import com.amazonaws.codepipeline.jobworker.JobService;
+import com.amazonaws.codepipeline.jobworker.model.RegionNotFoundException;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.codepipeline.AWSCodePipeline;
 import com.amazonaws.services.codepipeline.AWSCodePipelineClient;
+import com.amazonaws.util.StringUtils;
 
 /**
  * Default implementation for the job worker configuration. Can be used as a base configuration for different
@@ -31,6 +33,7 @@ import com.amazonaws.services.codepipeline.AWSCodePipelineClient;
  * By default: sets the polling interval to 30000 ms and starts 10 worker threads.
  */
 public abstract class DefaultJobWorkerConfiguration implements JobWorkerConfiguration {
+
     /**
      * The polling interval the daemon schedules the job poller which polls for new jobs.
      */
@@ -47,9 +50,9 @@ public abstract class DefaultJobWorkerConfiguration implements JobWorkerConfigur
     private static final int POLL_BATCH_SIZE = WORKER_THREADS;
 
     /**
-     * AWS Region.
+     * Environment variable to override region.
      */
-    private static final Region AWS_REGION = Region.getRegion(Regions.US_EAST_1);
+    private static final String AWS_REGION = "AWS_REGION";
 
     /**
      * @return the poll interval in milliseconds
@@ -79,7 +82,7 @@ public abstract class DefaultJobWorkerConfiguration implements JobWorkerConfigur
      */
     protected AWSCodePipeline codePipelineClient() {
         final AWSCodePipeline codePipelineClient = new AWSCodePipelineClient();
-        codePipelineClient.setRegion(AWS_REGION);
+        codePipelineClient.setRegion(getRegion());
         return codePipelineClient;
     }
 
@@ -94,4 +97,26 @@ public abstract class DefaultJobWorkerConfiguration implements JobWorkerConfigur
      * @return job service implementation
      */
     protected abstract JobService jobService();
+
+    /**
+     * Fetch region from environment variable, if not found fetch from EC2 instance metadata.
+     *
+     * @return Region the region
+     */
+    protected static Region getRegion() {
+        final String awsRegion = System.getProperty(AWS_REGION);
+        if (!StringUtils.isNullOrEmpty(awsRegion)) {
+            try {
+                return Region.getRegion(Regions.fromName(awsRegion));
+            } catch (final IllegalArgumentException e) {
+                throw new RegionNotFoundException(String.format("Unknown AWS region: '%s'. Choose a valid value for environment variable AWS_REGION", awsRegion), e);
+            }
+        }
+
+        final Region region = Regions.getCurrentRegion();
+        if (region == null) {
+            throw new RegionNotFoundException("Region could not be determined from EC2 instance metadata");
+        }
+        return region;
+    }
 }
