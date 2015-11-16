@@ -20,6 +20,8 @@ import com.amazonaws.codepipeline.jobworker.model.AWSSessionCredentials;
 import com.amazonaws.codepipeline.jobworker.model.ActionTypeId;
 import com.amazonaws.codepipeline.jobworker.model.Artifact;
 import com.amazonaws.codepipeline.jobworker.model.CurrentRevision;
+import com.amazonaws.codepipeline.jobworker.model.EncryptionKey;
+import com.amazonaws.codepipeline.jobworker.model.EncryptionKeyType;
 import com.amazonaws.codepipeline.jobworker.model.ExecutionDetails;
 import com.amazonaws.codepipeline.jobworker.model.FailureDetails;
 import com.amazonaws.codepipeline.jobworker.model.JobData;
@@ -69,7 +71,8 @@ public class JobConverter {
                 convert(jobData.getInputArtifacts()),
                 convert(jobData.getOutputArtifacts()),
                 convert(jobData.getArtifactCredentials()),
-                jobData.getContinuationToken());
+                jobData.getContinuationToken(),
+                convert(jobData.getEncryptionKey()));
     }
 
     private final static JobData convert(final com.amazonaws.services.codepipeline.model.ThirdPartyJobData jobData) {
@@ -81,7 +84,8 @@ public class JobConverter {
                 convert(jobData.getInputArtifacts()),
                 convert(jobData.getOutputArtifacts()),
                 convert(jobData.getArtifactCredentials()),
-                jobData.getContinuationToken());
+                jobData.getContinuationToken(),
+                convert(jobData.getEncryptionKey()));
     }
 
     private final static AWSSessionCredentials convert(final com.amazonaws.services.codepipeline.model.AWSSessionCredentials actionCredentials) {
@@ -91,6 +95,14 @@ public class JobConverter {
         return new AWSSessionCredentials(actionCredentials.getAccessKeyId(),
                 actionCredentials.getSecretAccessKey(),
                 actionCredentials.getSessionToken());
+    }
+
+    private final static EncryptionKey convert(final com.amazonaws.services.codepipeline.model.EncryptionKey encryptionKey) {
+        if (encryptionKey == null) {
+            return null;
+        }
+        return new EncryptionKey(EncryptionKeyType.valueOf(encryptionKey.getType()),
+                encryptionKey.getId());
     }
 
     private final static List<Artifact> convert(final List<com.amazonaws.services.codepipeline.model.Artifact> artifacts) {

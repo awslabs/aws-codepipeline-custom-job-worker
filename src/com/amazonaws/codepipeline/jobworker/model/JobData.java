@@ -25,6 +25,7 @@ public class JobData {
     private final List<Artifact> outputArtifacts;
     private final AWSSessionCredentials artifactCredentials;
     private final String continuationToken;
+    private final EncryptionKey encryptionKey;
 
     /**
      * Initializes the job data structure.
@@ -38,7 +39,8 @@ public class JobData {
                    final List<Artifact> inputArtifacts,
                    final List<Artifact> outputArtifacts,
                    final AWSSessionCredentials artifactCredentials,
-                   final String continuationToken) {
+                   final String continuationToken,
+                   final EncryptionKey encryptionKey) {
         if (actionConfiguration == null) {
             this.actionConfiguration = Collections.emptyMap();
         } else {
@@ -49,6 +51,7 @@ public class JobData {
         this.outputArtifacts = initArtifacts(outputArtifacts);
         this.artifactCredentials = artifactCredentials;
         this.continuationToken = continuationToken;
+        this.encryptionKey = encryptionKey;
     }
 
     private List<Artifact> initArtifacts(final List<Artifact> artifacts) {
@@ -92,5 +95,12 @@ public class JobData {
      */
     public String getContinuationToken() {
         return continuationToken;
+    }
+
+    /**
+     * @return encryption key for S3 bucket
+     */
+    public EncryptionKey getEncryptionKey() {
+        return encryptionKey;
     }
 }

@@ -90,6 +90,6 @@ public class CodePipelineJobProcessorTest {
         if (jobStatus != null) {
             actionConfiguration.put(JOB_STATUS, jobStatus.toString());
         }
-        return new JobData(actionConfiguration, null, null, null, null);
+        return new JobData(actionConfiguration, null, null, null, null, null);
     }
 }
