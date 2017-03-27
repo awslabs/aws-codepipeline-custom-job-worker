@@ -1,4 +1,4 @@
 .DS_STORE
 .idea/
-build/
 *.iml
+target/

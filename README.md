@@ -5,16 +5,15 @@ Read more about CodePipeline: http://aws.amazon.com/codepipeline/
 ### Dependencies
 Install the following tools to build the AWS CodePipeline Job Worker:
 - Java SE Development Kit 8
-- Apache Ant
+- Apache Maven 3.3
 
 ### Ant targets
 You can use the following ant targets to build the code:
 ```bash
-ant clean    # Cleans the workspace
-ant compile  # Compiles the code
-ant junit    # Runs the unit tests
-ant jar      # Creates the jar file
-ant release  # Default target, which compiles the code, runs the unit tests, creates the jar file and deployment bundle
+mvn clean    # Cleans the workspace
+mvn compile  # Compiles the code
+mvn test    # Runs the unit tests
+mvn package  # Default target, which compiles the code, runs the unit tests, creates the jar file and deployment bundle
 ```
 
 ## Start
@@ -72,7 +71,12 @@ APPLICATION_NAME=AwsCodePipelineJobWorker
 DEPLOYMENT_GROUP_NAME=Production
 
 # Compile the code and create deployment bundle
-ant release
+mvn package
+
+# Install the jar file as a dependency
+```
+mvn install:install-file -Dfile=target/jobworker-1.0.jar -DgroupId=com.amazonaws.codepipeline -DartifactId=jobworker -Dversion=1.0 -Dpackaging=jar
+```
 
 # Create a tar archive from the build output
 cd build/output
