@@ -49,7 +49,8 @@ PID_FILE="$INSTALL_DIR/pid/$SERVICE_NAME.pid"
 aws_codepipeline_job_worker()
 {
     cd $INSTALL_DIR
-    $JSVC_EXEC $1 -user $RUN_AS_USER -pidfile $PID_FILE -home $JAVA_JRE_DIR -classpath $CLASS_PATH $CLASS_NAME_DAEMON $CLASS_NAME_CONFIGURATION
+    AWS_REGION=`curl --silent --fail http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}'`
+    $JSVC_EXEC $1 -DAWS_REGION=$AWS_REGION -user $RUN_AS_USER -pidfile $PID_FILE -home $JAVA_JRE_DIR -classpath $CLASS_PATH $CLASS_NAME_DAEMON $CLASS_NAME_CONFIGURATION
 }
 
 start()
