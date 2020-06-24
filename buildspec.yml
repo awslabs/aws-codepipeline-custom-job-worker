@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - mvn package
+reports:
+  UnitTests:
+    files:
+      - '**/*'
+    base-directory: 'target/surefire-reports'
+artifacts:
+  files:
+    - target/jobworker-1.0.jar
+  discard-paths: yes
