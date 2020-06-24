@@ -15,7 +15,8 @@ package com.amazonaws.codepipeline.jobworker.plugin.customaction;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.codepipeline.jobworker.JobService;
 import com.amazonaws.codepipeline.jobworker.Validator;
@@ -41,7 +42,7 @@ import com.amazonaws.codepipeline.jobworker.model.FailureDetails;
  * Service interface wrapper for the custom action job api.
  */
 public class CustomActionJobService implements JobService {
-    private static final Logger LOGGER = Logger.getLogger(CustomActionJobService.class);
+    private static final Logger LOGGER = LogManager.getLogger(CustomActionJobService.class);
 
     private final AWSCodePipeline codePipelineClient;
     private final ActionTypeId actionTypeId;

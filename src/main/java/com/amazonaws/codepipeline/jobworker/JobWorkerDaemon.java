@@ -19,7 +19,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.daemon.DaemonInitException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.codepipeline.jobworker.configuration.JobWorkerConfiguration;
 import com.amazonaws.codepipeline.jobworker.model.RegionNotFoundException;
@@ -30,7 +31,7 @@ import com.amazonaws.codepipeline.jobworker.configuration.CustomActionJobWorkerC
  */
 public class JobWorkerDaemon implements Daemon {
 
-    private static final Logger LOGGER = Logger.getLogger(JobWorkerDaemon.class);
+    private static final Logger LOGGER = LogManager.getLogger(JobWorkerDaemon.class);
 
     private final ScheduledExecutorService executorService;
 
