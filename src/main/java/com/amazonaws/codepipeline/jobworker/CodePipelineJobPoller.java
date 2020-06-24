@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.codepipeline.jobworker.model.WorkItem;
 import com.amazonaws.codepipeline.jobworker.model.JobStatus;
@@ -33,7 +34,7 @@ import com.amazonaws.codepipeline.jobworker.model.WorkResultStatus;
  */
 public class CodePipelineJobPoller implements JobPoller {
 
-    private static final Logger LOGGER = Logger.getLogger(CodePipelineJobPoller.class);
+    private static final Logger LOGGER = LogManager.getLogger(CodePipelineJobPoller.class);
 
     private final JobProcessor jobProcessor;
     private final JobService jobService;
