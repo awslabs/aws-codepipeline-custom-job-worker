@@ -43,7 +43,7 @@ import com.amazonaws.codepipeline.jobworker.model.JobStatus;
 import com.amazonaws.codepipeline.jobworker.model.WorkItem;
 import com.amazonaws.codepipeline.jobworker.model.WorkResult;
 
-public class CodePipelineJobPollerTest {
+public class SecondCodePipelineJobPollerTest {
     private final static int POLL_BATCH_SIZE = 10;
 
     @Mock
@@ -70,48 +70,83 @@ public class CodePipelineJobPollerTest {
                 UUID.randomUUID().toString(),
                 new ExecutionDetails("test summary", UUID.randomUUID().toString(), 100),
                 new CurrentRevision("test revision", "test change identifier"));
+    }
 
-        when(jobProcessor.process(any()))
-                .thenReturn(workResult);
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowWhenJobServiceIsNull() {
+        new CodePipelineJobPoller(null, jobProcessor, executorService, POLL_BATCH_SIZE);
+    }
 
+    @Test
+    public void testClassLoad() throws Exception {
+        final String configurationClassName = "com.amazonaws.codepipeline.jobworker.CodePipelineJobPoller";
+        Class.forName(configurationClassName);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowWhenJobProcessorIsNull() {
+        new CodePipelineJobPoller(jobService, null, executorService, POLL_BATCH_SIZE);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowWhenExecutorServiceIsNull() {
+        new CodePipelineJobPoller(jobService, jobProcessor, null, POLL_BATCH_SIZE);
+    }
+
+    @Test
+    public void shouldPollForJobsWhenThereAreNoActiveWorkerThreads() {
+        // given
+        when(executorService.getActiveCount())
+                .thenReturn(0);
+
+        // when
+        jobPoller.execute();
+
+        // then
+        verify(jobService).pollForJobs(POLL_BATCH_SIZE);
+    }
+
+    @Test
+    public void shouldPollForJobsWithBatchSizeWhenNotAllWorkerThreadsAreBusy() {
+        // given
+        final int actionExecutionCount = 4;
+        when(executorService.getActiveCount())
+                .thenReturn(actionExecutionCount);
+
+        // when
+        jobPoller.execute();
+
+        // then
+        verify(jobService).pollForJobs(POLL_BATCH_SIZE - actionExecutionCount);
+    }
+
+    @Test
+    public void shouldStartThreadsForAllReturnedJobs() {
+        // given
+        final int jobCount = 6;
+        when(jobService.pollForJobs(POLL_BATCH_SIZE))
+                .thenReturn(randomWorkItems(jobCount));
+
+        // when
+        jobPoller.execute();
+
+        // then
+        verify(executorService, times(jobCount)).submit(any(Runnable.class));
+    }
+
+    @Test
+    public void shouldNotHandOutWorkToJobProcessorWhenStatusFailed() {
+        // given
         when(jobService.acknowledgeJob(any(), any(), any()))
-                .thenReturn(JobStatus.InProgress);
-    }
+                .thenReturn(JobStatus.Failed);
 
-    @Test
-    public void shouldAcknowledgeAllReturnedJobs() {
         // when
-        final int jobCount = 7;
+        final int jobCount = 10;
         executeProcessWorkRunnables(jobCount);
 
         // then
-        verify(jobService, times(jobCount)).acknowledgeJob(any(), any(), any());
+        verify(jobProcessor, never()).process(any());
     }
-
-    @Test
-    public void shouldHandOutWorkToJobProcessorWhenStatusInProgress() {
-        // when
-        final int jobCount = 8;
-        executeProcessWorkRunnables(jobCount);
-
-        // then
-        verify(jobProcessor, times(jobCount)).process(any());
-    }
-    
-    @Test
-    public void shouldReportSuccessWhenProcessorReturnsSuccess() {
-        // when
-        final int jobCount = 1;
-        executeProcessWorkRunnables(jobCount);
-
-        // then
-        verify(jobService).putJobSuccess(any(),
-                any(),
-                eq(workResult.getExecutionDetails()),
-                eq(workResult.getCurrentRevision()),
-                eq(workResult.getContinuationToken()));
-    }
-   
 
     private void executeProcessWorkRunnables(final int workItemCount) {
         when(jobService.pollForJobs(POLL_BATCH_SIZE)).thenReturn(randomWorkItems(workItemCount));
