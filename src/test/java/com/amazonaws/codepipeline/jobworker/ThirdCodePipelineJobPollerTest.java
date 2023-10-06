@@ -43,7 +43,7 @@ import com.amazonaws.codepipeline.jobworker.model.JobStatus;
 import com.amazonaws.codepipeline.jobworker.model.WorkItem;
 import com.amazonaws.codepipeline.jobworker.model.WorkResult;
 
-public class CodePipelineJobPollerTest {
+public class ThirdCodePipelineJobPollerTest {
     private final static int POLL_BATCH_SIZE = 10;
 
     @Mock
@@ -70,48 +70,40 @@ public class CodePipelineJobPollerTest {
                 UUID.randomUUID().toString(),
                 new ExecutionDetails("test summary", UUID.randomUUID().toString(), 100),
                 new CurrentRevision("test revision", "test change identifier"));
-
-        when(jobProcessor.process(any()))
-                .thenReturn(workResult);
-
+        
         when(jobService.acknowledgeJob(any(), any(), any()))
                 .thenReturn(JobStatus.InProgress);
     }
 
     @Test
-    public void shouldAcknowledgeAllReturnedJobs() {
-        // when
-        final int jobCount = 7;
-        executeProcessWorkRunnables(jobCount);
+    public void shouldHandleAllRuntimeExceptions() {
+        // given
+        when(jobService.acknowledgeJob(any(), any(), any()))
+                .thenThrow(new RuntimeException("Test Exception"));
 
-        // then
-        verify(jobService, times(jobCount)).acknowledgeJob(any(), any(), any());
+        // when
+        final int jobCount = 1;
+        executeProcessWorkRunnables(jobCount);
     }
 
     @Test
-    public void shouldHandOutWorkToJobProcessorWhenStatusInProgress() {
-        // when
-        final int jobCount = 8;
-        executeProcessWorkRunnables(jobCount);
+    public void shouldReportFailureWhenProcessorReturnsFailure() {
+        // given
+        workResult = WorkResult.failure(
+                UUID.randomUUID().toString(),
+                new FailureDetails(FailureType.JobFailed, "failure message"));
+        when(jobProcessor.process(any()))
+                .thenReturn(workResult);
 
-        // then
-        verify(jobProcessor, times(jobCount)).process(any());
-    }
-    
-    @Test
-    public void shouldReportSuccessWhenProcessorReturnsSuccess() {
         // when
         final int jobCount = 1;
         executeProcessWorkRunnables(jobCount);
 
         // then
-        verify(jobService).putJobSuccess(any(),
+        verify(jobService).putJobFailure(any(),
                 any(),
-                eq(workResult.getExecutionDetails()),
-                eq(workResult.getCurrentRevision()),
-                eq(workResult.getContinuationToken()));
+                eq(workResult.getFailureDetails()));
     }
-   
 
     private void executeProcessWorkRunnables(final int workItemCount) {
         when(jobService.pollForJobs(POLL_BATCH_SIZE)).thenReturn(randomWorkItems(workItemCount));
